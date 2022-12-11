@@ -21,7 +21,6 @@ func NewMyTeamRepository(dbConn *sql.DB) *MyTeamRepository {
 }
 
 func (m *MyTeamRepository) AddScore(ctx context.Context, myTeam *entity.MyTeam, score float64) error {
-	// check if my team exists for update
 	_, err := m.FindByIDForUpdate(ctx, myTeam.ID)
 	if err != nil {
 		return err
@@ -103,13 +102,11 @@ func (m *MyTeamRepository) FindAllPlayers(ctx context.Context, teamID string) ([
 }
 
 func (m *MyTeamRepository) SavePlayers(ctx context.Context, myTeam *entity.MyTeam) error {
-	// delete all players
 	err := m.Queries.DeleteAllPlayersFromMyTeam(ctx, myTeam.ID)
 	if err != nil {
 		return err
 	}
 
-	// add all players
 	for _, playerId := range myTeam.Players {
 		err = m.addPlayer(ctx, myTeam.ID, playerId)
 		if err != nil {

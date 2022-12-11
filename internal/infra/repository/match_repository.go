@@ -82,13 +82,12 @@ func (r *MatchRepository) FindByID(ctx context.Context, id string) (*entity.Matc
 			return nil, err
 		}
 	}
-	// get actions
+
 	actions, err := r.Queries.GetMatchActions(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	// convert actions to entity
 	var gameActions []entity.GameAction
 	for _, action := range actions {
 		playerInfo, err := r.Queries.FindPlayerById(ctx, action.PlayerID)
@@ -149,13 +148,12 @@ func (r *MatchRepository) FindAll(ctx context.Context) ([]*entity.Match, error) 
 				return nil, err
 			}
 		}
-		// get actions
+
 		actions, err := r.Queries.GetMatchActions(ctx, match.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		// convert actions to entity
 		for _, action := range actions {
 			playerInfo, err := r.Queries.FindPlayerById(ctx, action.PlayerID)
 			if err != nil {

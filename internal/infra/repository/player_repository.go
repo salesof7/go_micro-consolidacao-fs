@@ -55,7 +55,6 @@ func (r *PlayerRepository) FindByIDForUpdate(ctx context.Context, id string) (*e
 }
 
 func (r *PlayerRepository) Update(ctx context.Context, player *entity.Player) error {
-	// check if player exists for update
 	_, err := r.FindByIDForUpdate(ctx, player.ID)
 	if err != nil {
 		return err
