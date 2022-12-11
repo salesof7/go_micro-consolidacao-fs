@@ -6,21 +6,20 @@ import (
 	"github.com/devfullcycle/imersao10-consolidacao/internal/domain/entity"
 )
 
-func ChoosePlayer(myTeam entity.MyTeam, players []entity.Player) error {
+var errNotEnoughMoney = errors.New("not enough money")
+
+func ChoosePlayers(myTeam *entity.MyTeam, myPlayers []entity.Player, players []entity.Player) error {
 	totalCost := 0.0
-	totalEarned := 0.0
+	totalEarned := calculateTotalEarned(myPlayers, players)
 
 	for _, player := range players {
-		if playerInMyTeam(player, myTeam) && !playerInPlayersList(player, &players) {
-			totalEarned += player.Price
-		}
-		if !playerInMyTeam(player, myTeam) && playerInPlayersList(player, &players) {
+		if !playerInMyTeam(player, *myTeam) && playerInPlayersList(player, players) {
 			totalCost += player.Price
 		}
 	}
 
 	if totalCost > myTeam.Score+totalEarned {
-		return errors.New("not enough money")
+		return errNotEnoughMoney
 	}
 
 	myTeam.Score += totalEarned - totalCost
@@ -29,24 +28,33 @@ func ChoosePlayer(myTeam entity.MyTeam, players []entity.Player) error {
 	for _, player := range players {
 		myTeam.Players = append(myTeam.Players, player.ID)
 	}
-
 	return nil
 }
 
 func playerInMyTeam(player entity.Player, myTeam entity.MyTeam) bool {
-	for _, playerID := range myTeam.Players {
-		if player.ID == playerID {
+	for _, p := range myTeam.Players {
+		if p == player.ID {
 			return true
 		}
 	}
 	return false
 }
 
-func playerInPlayersList(player entity.Player, players *[]entity.Player) bool {
-	for _, playerInPlayersList := range *players {
-		if player.ID == playerInPlayersList.ID {
+func playerInPlayersList(player entity.Player, players []entity.Player) bool {
+	for _, p := range players {
+		if p.ID == player.ID {
 			return true
 		}
 	}
 	return false
+}
+
+func calculateTotalEarned(myPlayers []entity.Player, players []entity.Player) float64 {
+	var totalEarned float64
+	for _, myPlayer := range myPlayers {
+		if !playerInPlayersList(myPlayer, players) {
+			totalEarned += myPlayer.Price
+		}
+	}
+	return totalEarned
 }
